@@ -58,5 +58,37 @@ export default class UserController {
 
   updateUser = async (req: Request, res: Response): Promise<void> => {
     const userId: string = res.locals.userId;
+    const result = await this.userService.updateUser(userId, req.body);
+
+    if (result) {
+      if (result.isSuccessful) {
+        res.status(200).json({
+          result: result.data,
+          message: "업데이트 완료",
+        });
+      } else {
+        res.status(400).json({
+          message: "업데이트 정보를 입력해주세요",
+        });
+      }
+    }
+  };
+
+  deleteUser = async (req: Request, res: Response): Promise<void> => {
+    const userId: string = res.locals.userId;
+
+    const result = await this.userService.deleteUser(userId, req.body);
+
+    if (result) {
+      res.clearCookie("Authorization");
+      res.status(200).json({
+        isSuccessful: result.isSuccessful,
+        message: result.message,
+      });
+    } else {
+      res.status(400).json({
+        message: "회원 삭제 실패",
+      });
+    }
   };
 }

@@ -4,7 +4,8 @@ import { config } from "../../config";
 import auth from "../../middleware/auth";
 import User from "../../database/model/user.model";
 import UserRepository from "../repository/user.repository";
-import { UserInfo, LoginInfo } from "../../types/user";
+import { ResponseData } from "../../types/response";
+import { UserInfo, LoginInfo, UpdateInfo } from "../../types/user";
 
 const userRepository = container.resolve(UserRepository);
 
@@ -37,5 +38,39 @@ export default class UserService {
   }
   public async findById(userId: string) {
     return this.userRepository.findById(userId);
+  }
+
+  public async updateUser(
+    userId: string,
+    data: UpdateInfo
+  ): Promise<ResponseData<User> | undefined> {
+    Object.keys(data).forEach((key) => {
+      if (data[key] === undefined) delete data[key];
+    });
+
+    const user = await this.userRepository.findById(userId);
+
+    if (user) {
+      const permit = bcrypt.compareSync(data.confirmPassword, user.password); // 업데이트 요청에 대한 비밀번호 확인
+
+      if (permit) {
+        return this.userRepository.updateUser(user, data);
+      } else {
+        return undefined;
+      }
+    }
+  }
+  public async deleteUser(userId: string, data: { confirmPassword: string }) {
+    const user = await this.userRepository.findById(userId);
+    
+    if (user) {
+      const permit = bcrypt.compareSync(data.confirmPassword, user.password); // 업데이트 요청에 대한 비밀번호 확인
+
+      if (permit) {
+        return this.userRepository.deleteUser(user);
+      } else {
+        return undefined;
+      }
+    }
   }
 }

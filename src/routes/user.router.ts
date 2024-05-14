@@ -15,6 +15,7 @@ router.get('/me',auth.verifyUser,usercontroller.getProfile);
 
 router.route('/')
 .post(validator.signup,usercontroller.signup)
-
+.patch(validator.updateUser,auth.verifyUser,usercontroller.updateUser)
+.delete(auth.verifyUser,usercontroller.deleteUser)
 
 export default router;
