@@ -21,11 +21,12 @@ import User from "./user.model";
 export default class Book extends Model<BookAttributes, BookCreationAttributes> implements BookAttributes {
     @PrimaryKey
     @AutoIncrement
+    @AllowNull(false)
     @Column(DataType.BIGINT)
     bookId!: number;
 
     @ForeignKey(() => User)
-    @AllowNull(false)
+    @AllowNull(true)
     @Column(DataType.BIGINT)
     userId!: number;
 
